@@ -13,9 +13,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
-        versionName "0.18"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "0.18.0"
 
         externalNativeBuild {
             cmake {
@@ -37,7 +35,6 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/java'
-        test.java.srcDirs += 'src/test/java'
     }
 
     kotlinOptions { jvmTarget = '1.8' }
@@ -53,10 +50,10 @@ android {
     }
 }
 
-version '0.18'
+version '0.18.0'
 
 dependencies {
-    api 'org.dashj:dashj-bls:0.18-SNAPSHOT'
+    api 'org.dashj:dashj-bls:0.18.0'
 }
 
 repositories {
@@ -108,7 +105,7 @@ uploadArchives {
                 packaging 'aar'
                 groupId 'org.dashj.android'
                 artifactId 'dashj-bls-android'
-                version '0.18'
+                version '0.18.0'
                 description 'DashJ BLS Libary for Android'
                 url 'https://github.com/HashEngineering/dashj-bls-android'
 
