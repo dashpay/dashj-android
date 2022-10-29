@@ -3,8 +3,6 @@ plugins {
     id 'maven-publish'
     id 'maven'
     id 'signing'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
 }
 android {
     compileSdkVersion 29
@@ -37,7 +35,6 @@ android {
         main.java.srcDirs += 'src/main/java'
     }
 
-    kotlinOptions { jvmTarget = '1.8' }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -48,6 +45,8 @@ android {
             path 'cpp/CMakeLists.txt'
         }
     }
+
+    ndkVersion "21.1.6352462"
 }
 
 version '0.18.1'
@@ -59,7 +58,6 @@ dependencies {
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
 }
 
 task javadoc(type: Javadoc) {
@@ -93,11 +91,11 @@ uploadArchives {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: project.hasProperty('ossrhUsername')?project.findProperty('ossrhUsername'):'', password: project.hasProperty('ossrhPassword')?project.findProperty('ossrhPassword'):'')
             }
 
             snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: project.hasProperty('ossrhUsername')?project.findProperty('ossrhUsername'):'', password: project.hasProperty('ossrhPassword')?project.findProperty('ossrhPassword'):'')
             }
 
             pom.project {
