@@ -12,7 +12,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 31
         versionCode 1
-        versionName "1.2.5-SNAPSHOT"
+        versionName "1.0.0"
 
         defaultConfig {
             ndk {
@@ -59,10 +59,10 @@ android {
     }
 }
 
-version '1.2.5-SNAPSHOT'
+version '1.0.0'
 
 dependencies {
-    api 'org.dashj:dashj-bls:1.2.5-SNAPSHOT'
+    api 'org.dashj:dashj-bls:1.0.0'
 }
 
 repositories {
