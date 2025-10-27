@@ -4,15 +4,18 @@ plugins {
     id 'signing'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'org.jreleaser' version '1.17.0'
 }
+version "1.0.1-SNAPSHOT"
 android {
-    compileSdkVersion 31
+    namespace "org.dashj.bls"
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 31
+        targetSdkVersion 35
         versionCode 1
-        versionName "1.0.0"
+        versionName "$version"
 
         defaultConfig {
             ndk {
@@ -36,24 +39,24 @@ android {
         main.java.srcDirs += 'src/main/java'
     }
 
-    kotlinOptions { jvmTarget = '1.8' }
+    kotlinOptions { jvmTarget = '17' }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     externalNativeBuild {
         cmake {
             path 'src/main/cpp/CMakeLists.txt'
-            version '3.18.1'
+            version '3.22.1'
         }
     }
-    ndkVersion '23.2.8568313'
+    ndkVersion '29.0.14206865'
 
     publishing {
         singleVariant("release") {
             // if you don't want sources/javadoc, remove these lines
-            withSourcesJar()
+            //withSourcesJar()
             //withJavadocJar()
         }
     }
@@ -63,6 +66,7 @@ version '1.0.0'
 
 dependencies {
     api 'org.dashj:dashj-bls:1.0.0'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 repositories {
@@ -71,18 +75,21 @@ repositories {
 }
 
 task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
+    source = fileTree(dir: 'src/main/java', include: '**/*.java')
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    exclude '**/BuildConfig.java'
+    exclude '**/R.java'
+    failOnError false
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+task javadocJar(type: Jar) {
+    archiveClassifier = 'javadoc'
+    // Create empty javadoc jar for now
 }
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 artifacts {
@@ -101,21 +108,21 @@ task comps {
 afterEvaluate {
     publishing {
         publications {
-            release(MavenPublication) {
-                groupId group
-                artifactId 'dashj-bls-android'
+            mavenJava(MavenPublication) {
+                artifactId = 'dashj-bls-android'
                 version "$version"
                 from components.release
-
+                artifact sourcesJar
+                artifact javadocJar
                 pom {
                     name = 'DashJ-BLS-Android'
                     description = 'Dash BLS Android Library'
-                    url = 'httsp://dashj.org'
+                    url = 'https://github.com/dashpay/dashj-android'
 
                     licenses {
                         license {
-                            name = 'MIT'
-                            url = 'https://opensource.org/licenses/MIT'
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         }
                     }
                     developers {
@@ -135,20 +142,55 @@ afterEvaluate {
         }
         repositories {
             maven {
-                // change URLs to point to your repos, e.g. http://my.org/repo
-                def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                credentials {
-                    username = project.hasProperty('ossrhUsername') ? project.findProperty('ossrhUsername') : ''
-                    password = project.hasProperty('ossrhPassword') ? project.findProperty('ossrhPassword') : ''
-                }
+                url = layout.buildDirectory.dir('staging-deploy')
             }
         }
     }
+    
     signing {
         required { gradle.taskGraph.hasTask("publish") }
-        println("Components: " + publishing.publications)
-        sign publishing.publications.release
+        sign publishing.publications.mavenJava
+    }
+}
+
+jreleaser {
+    def projectVersion = version
+    project {
+        name = 'dashj-bls-android'
+        description = 'Dash BLS Android Library'
+        website = 'https://github.com/dashpay/dashj-android'
+        authors = ['HashEngineering']
+        license = 'The Apache License, Version 2.0'
+        gitRootSearch = true
+        version = projectVersion
+    }
+
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository("$buildDir/staging-deploy")
+                }
+            }
+            nexus2 {
+                app {
+                    active = 'SNAPSHOT'
+                    url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                    snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = true
+                    stagingRepository("$buildDir/staging-deploy")
+                }
+            }
+        }
     }
 }
