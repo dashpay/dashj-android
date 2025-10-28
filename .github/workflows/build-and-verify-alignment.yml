@@ -17,7 +17,7 @@ jobs:
         submodules: recursive
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -26,7 +26,7 @@ jobs:
       uses: android-actions/setup-android@v3
 
     - name: Cache Gradle packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.gradle/caches
@@ -152,7 +152,7 @@ jobs:
         done
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: build-outputs
@@ -162,7 +162,7 @@ jobs:
         retention-days: 7
 
     - name: Upload lint reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: lint-reports
