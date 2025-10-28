@@ -43,7 +43,7 @@ jobs:
 
     - name: Verify 16KB Page Size Alignment
       run: |
-        echo "🔍 Checking 16KB page size alignment of native libraries..."
+        echo "🔍 Checking 16KB page size alignment of 64-bit native libraries..."
         
         # Function to check alignment of a shared library
         check_alignment() {
@@ -89,9 +89,9 @@ jobs:
           fi
         }
         
-        # Find all .so files in build outputs
-        echo "Finding native libraries in build outputs..."
-        so_files=$(find . -path "*/build/intermediates/cxx/*/obj/*/*.so" -type f | grep -E "(Release|RelWithDebInfo)" | head -20)
+        # Find all .so files in build outputs (64-bit architectures only)
+        echo "Finding 64-bit native libraries in build outputs..."
+        so_files=$(find . -path "*/build/intermediates/cxx/*/obj/*/*.so" -type f | grep -E "(Release|RelWithDebInfo)" | grep -E "(arm64-v8a|x86_64)" | head -20)
         
         if [ -z "$so_files" ]; then
           echo "❌ No native libraries found in build outputs"
