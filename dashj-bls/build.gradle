@@ -62,10 +62,8 @@ android {
     }
 }
 
-version '1.0.0'
-
 dependencies {
-    api 'org.dashj:dashj-bls:1.0.0'
+    api 'org.dashj:dashj-bls:1.0.1'
     testImplementation 'junit:junit:4.13.2'
 }
 
