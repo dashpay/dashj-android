@@ -81,7 +81,7 @@ task sourcesJar(type: Jar) {
 //                pom {
 //                    name = 'DashJ Scrypt'
 //                    description = 'DashJ Scrypt Libary for Android'
-//                    url = 'https://github.com/HashEngineering/dashj-bls-android'
+//                    url = 'https://github.com/HashEngineering/dashj-android'
 //
 //                    licenses {
 //                        license {
@@ -160,7 +160,7 @@ afterEvaluate {
                 pom {
                     name = 'DashJ Scrypt'
                     description = 'DashJ Scrypt Libary for Android'
-                    url = 'https://github.com/dashpay/dashj-bls-android'
+                    url = 'https://github.com/dashpay/dashj-android'
 
                     licenses {
                         license {
@@ -201,7 +201,7 @@ jreleaser {
     project {
         name = 'dashj-scrypt-android'
         description = 'DashJ Scrypt Libary for Android'
-        website = 'https://github.com/dashpay/dashj-bls-android'
+        website = 'https://github.com/dashpay/dashj-android'
         authors = ['HashEngineering']
         license = 'The Apache License, Version 2.0'
         gitRootSearch = true

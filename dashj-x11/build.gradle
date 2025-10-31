@@ -193,12 +193,12 @@ uploadArchives {
                 artifactId 'dashj-x11-android'
                 version '0.17.5'
                 description 'DashJ X11 Libary for Android'
-                url 'https://github.com/HashEngineering/dashj-bls-android'
+                url 'https://github.com/HashEngineering/dashj-android'
 
                 scm {
-                    connection 'scm:svn:https://github.com/HashEngineering/dashj-bls-android'
-                    developerConnection 'scm:svn:https://github.com/HashEngineering/dashj-bls-android'
-                    url 'https://github.com/HashEngineering/dashj-bls-android'
+                    connection 'scm:svn:https://github.com/HashEngineering/dashj-android'
+                    developerConnection 'scm:svn:https://github.com/HashEngineering/dashj-android'
+                    url 'https://github.com/HashEngineering/dashj-android'
                 }
 
                 licenses {
