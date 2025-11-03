@@ -6,6 +6,7 @@ buildscript {
         mavenLocal()
         mavenCentral()
         google()
+        gradlePluginPortal()  // Required for JReleaser plugin
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.5.1'

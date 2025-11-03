@@ -149,18 +149,23 @@ task comps {
 }
 
 afterEvaluate {
+    def projectVersion = version
+    
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            release(MavenPublication) {
+                groupId group
                 artifactId = 'dashj-scrypt-android'
-                version "$version"
-                // from components.release
-                artifact sourcesJar
-                artifact javadocJar
+                version projectVersion
+                from components.release
+
                 pom {
                     name = 'DashJ Scrypt'
                     description = 'DashJ Scrypt Libary for Android'
                     url = 'https://github.com/dashpay/dashj-android'
+                    
+                    // Override packaging to jar for Maven Central compatibility
+                    packaging = 'jar'
 
                     licenses {
                         license {
@@ -189,51 +194,49 @@ afterEvaluate {
             }
         }
     }
-    
-    signing {
-        required { gradle.taskGraph.hasTask("publish") }
-        sign publishing.publications.mavenJava
-    }
-}
+    jreleaser {
+        project {
+            name = 'dashj-scrypt-android'
+            description = 'DashJ Scrypt Libary for Android'
+            website = 'https://github.com/dashpay/dashj-android'
+            authors = ['HashEngineering']
+            license = 'The Apache License, Version 2.0'
+            gitRootSearch = true
+            version = projectVersion
+        }
 
-jreleaser {
-    def projectVersion = version
-    project {
-        name = 'dashj-scrypt-android'
-        description = 'DashJ Scrypt Libary for Android'
-        website = 'https://github.com/dashpay/dashj-android'
-        authors = ['HashEngineering']
-        license = 'The Apache License, Version 2.0'
-        gitRootSearch = true
-        version = projectVersion
-    }
+        signing {
+            active = 'ALWAYS'
+            armored = true
+        }
 
-    signing {
-        active = 'ALWAYS'
-        armored = true
-    }
-
-    deploy {
-        maven {
-            mavenCentral {
-                sonatype {
-                    active = 'ALWAYS'
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-                    stagingRepository("$buildDir/staging-deploy")
+        deploy {
+            maven {
+                mavenCentral {
+                    sonatype {
+                        active = 'ALWAYS'
+                        url = 'https://central.sonatype.com/api/v1/publisher'
+                        stagingRepository("$buildDir/staging-deploy")
+                    }
                 }
-            }
-            nexus2 {
-                app {
-                    active = 'SNAPSHOT'
-                    url = 'https://central.sonatype.com/repository/maven-snapshots/'
-                    snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
-                    applyMavenCentralRules = true
-                    snapshotSupported = true
-                    closeRepository = true
-                    releaseRepository = true
-                    stagingRepository("$buildDir/staging-deploy")
+                nexus2 {
+                    app {
+                        active = 'SNAPSHOT'
+                        url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                        snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
+                        applyMavenCentralRules = false // must be false for aar
+                        snapshotSupported = true
+                        closeRepository = true
+                        releaseRepository = true
+                        stagingRepository("$buildDir/staging-deploy")
+                    }
                 }
             }
         }
     }
+    signing {
+        required { gradle.taskGraph.hasTask("publish") }
+        sign publishing.publications.release
+    }
 }
+
