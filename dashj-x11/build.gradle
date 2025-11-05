@@ -2,19 +2,20 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
     id 'signing'
+    id 'org.jreleaser' version '1.17.0'
 }
 
-version "0.17.5"
+version "1.0.0-SNAPSHOT"
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    namespace "org.dashj.x11"
+    compileSdkVersion 34
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 35
         versionCode 1
-        versionName "0.17.5"
+        versionName "$version"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -27,8 +28,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     externalNativeBuild {
@@ -36,10 +37,16 @@ android {
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
+    ndkVersion '29.0.14206865'
+
+    publishing {
+        singleVariant("release") {
+        }
+    }
 }
 
 dependencies {
-
+    testImplementation 'junit:junit:4.13.2'
 }
 
 task javadoc(type: Javadoc) {
@@ -48,13 +55,13 @@ task javadoc(type: Javadoc) {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 artifacts {
@@ -71,23 +78,28 @@ task comps {
 }
 
 afterEvaluate {
+    def projectVersion = version
+    
     publishing {
         publications {
             release(MavenPublication) {
                 groupId group
-                artifactId 'dashj-bls-android'
-                version "$version"
+                artifactId = 'dashj-x11-android'
+                version projectVersion
                 from components.release
 
                 pom {
                     name = 'DashJ X11'
-                    description = 'Dash BLS Android Library'
-                    url = 'https://github.com/dashpay/dashj-bls-android'
+                    description = 'DashJ X11 Library for Android'
+                    url = 'https://github.com/dashpay/dashj-android'
+                    
+                    // Override packaging to jar for Maven Central compatibility
+                    packaging = 'jar'
 
                     licenses {
                         license {
-                            name = 'MIT'
-                            url = 'https://opensource.org/licenses/MIT'
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         }
                     }
                     developers {
@@ -107,20 +119,52 @@ afterEvaluate {
         }
         repositories {
             maven {
-                // change URLs to point to your repos, e.g. http://my.org/repo
-                def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                credentials {
-                    username = project.hasProperty('ossrhUsername') ? project.findProperty('ossrhUsername') : ''
-                    password = project.hasProperty('ossrhPassword') ? project.findProperty('ossrhPassword') : ''
+                url = layout.buildDirectory.dir('staging-deploy')
+            }
+        }
+    }
+    jreleaser {
+        project {
+            name = 'dashj-x11-android'
+            description = 'DashJ X11 Library for Android'
+            website = 'https://github.com/dashpay/dashj-android'
+            authors = ['HashEngineering']
+            license = 'The Apache License, Version 2.0'
+            gitRootSearch = true
+            version = projectVersion
+        }
+
+        signing {
+            active = 'ALWAYS'
+            armored = true
+        }
+
+        deploy {
+            maven {
+                mavenCentral {
+                    sonatype {
+                        active = 'ALWAYS'
+                        url = 'https://central.sonatype.com/api/v1/publisher'
+                        stagingRepository("$buildDir/staging-deploy")
+                    }
+                }
+                nexus2 {
+                    app {
+                        active = 'SNAPSHOT'
+                        url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                        snapshotUrl = 'https://central.sonatype.com/repository/maven-snapshots/'
+                        applyMavenCentralRules = false // must be false for aar
+                        snapshotSupported = true
+                        closeRepository = true
+                        releaseRepository = true
+                        stagingRepository("$buildDir/staging-deploy")
+                    }
                 }
             }
         }
     }
     signing {
         required { gradle.taskGraph.hasTask("publish") }
-        println("Components: " + publishing.publications)
         sign publishing.publications.release
     }
 }
@@ -151,12 +195,12 @@ uploadArchives {
                 artifactId 'dashj-x11-android'
                 version '0.17.5'
                 description 'DashJ X11 Libary for Android'
-                url 'https://github.com/HashEngineering/dashj-bls-android'
+                url 'https://github.com/HashEngineering/dashj-android'
 
                 scm {
-                    connection 'scm:svn:https://github.com/HashEngineering/dashj-bls-android'
-                    developerConnection 'scm:svn:https://github.com/HashEngineering/dashj-bls-android'
-                    url 'https://github.com/HashEngineering/dashj-bls-android'
+                    connection 'scm:svn:https://github.com/HashEngineering/dashj-android'
+                    developerConnection 'scm:svn:https://github.com/HashEngineering/dashj-android'
+                    url 'https://github.com/HashEngineering/dashj-android'
                 }
 
                 licenses {
