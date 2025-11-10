@@ -4,8 +4,9 @@ plugins {
     id 'signing'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'org.jreleaser' version '1.17.0'
 }
+apply plugin: 'org.jreleaser'
+
 version "1.0.1-SNAPSHOT"
 android {
     namespace "org.dashj.bls"
@@ -55,9 +56,6 @@ android {
 
     publishing {
         singleVariant("release") {
-            // if you don't want sources/javadoc, remove these lines
-            //withSourcesJar()
-            //withJavadocJar()
         }
     }
 }
@@ -118,9 +116,7 @@ afterEvaluate {
                     name = 'DashJ-BLS-Android'
                     description = 'Dash BLS Android Library'
                     url = 'https://github.com/dashpay/dashj-android'
-                    
-                    // Override packaging to jar for Maven Central compatibility
-                    packaging = 'jar'
+
 
                     licenses {
                         license {
@@ -172,6 +168,7 @@ afterEvaluate {
                         active = 'ALWAYS'
                         url = 'https://central.sonatype.com/api/v1/publisher'
                         stagingRepository("$buildDir/staging-deploy")
+                        verifyPom = false
                     }
                 }
                 nexus2 {
@@ -184,6 +181,7 @@ afterEvaluate {
                         closeRepository = true
                         releaseRepository = true
                         stagingRepository("$buildDir/staging-deploy")
+                        verifyPom = false
                     }
                 }
             }

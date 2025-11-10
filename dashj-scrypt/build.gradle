@@ -2,8 +2,8 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
     id 'signing'
-    id 'org.jreleaser' version '1.17.0'
 }
+apply plugin: 'org.jreleaser'
 
 version "1.0.0-SNAPSHOT"
 
@@ -163,9 +163,6 @@ afterEvaluate {
                     name = 'DashJ Scrypt'
                     description = 'DashJ Scrypt Libary for Android'
                     url = 'https://github.com/dashpay/dashj-android'
-                    
-                    // Override packaging to jar for Maven Central compatibility
-                    packaging = 'jar'
 
                     licenses {
                         license {
@@ -217,6 +214,7 @@ afterEvaluate {
                         active = 'ALWAYS'
                         url = 'https://central.sonatype.com/api/v1/publisher'
                         stagingRepository("$buildDir/staging-deploy")
+                        verifyPom = false
                     }
                 }
                 nexus2 {
@@ -229,6 +227,7 @@ afterEvaluate {
                         closeRepository = true
                         releaseRepository = true
                         stagingRepository("$buildDir/staging-deploy")
+                        verifyPom = false
                     }
                 }
             }
