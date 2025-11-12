@@ -7,7 +7,7 @@ plugins {
 }
 apply plugin: 'org.jreleaser'
 
-version "1.0.1-SNAPSHOT"
+version "1.0.1"
 android {
     namespace "org.dashj.bls"
     compileSdkVersion 34
